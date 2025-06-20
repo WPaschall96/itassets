@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Asset Tracker Pro</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="manifest" href="data:application/json;base64,eyJuYW1lIjoiQXNzZXQgVHJhY2tlciBQcm8iLCJzaG9ydF9uYW1lIjoiQXNzZXRUcmFja2VyIiwiZGVzY3JpcHRpb24iOiJNb2Rlcm4gYXNzZXQgdHJhY2tpbmcgYXBwbGljYXRpb24iLCJzdGFydF91cmwiOiIvIiwiZGlzcGxheSI6InN0YW5kYWxvbmUiLCJ0aGVtZV9jb2xvciI6IiMyMTgwOGQiLCJiYWNrZ3JvdW5kX2NvbG9yIjoiI2ZjZmNmOSJ9">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="header__content">
+                <div class="header__left">
+                    <h1 class="header__logo">Asset Tracker Pro</h1>
+                    <nav class="header__nav" id="mainNav">
+                        <button class="nav-item nav-item--active" data-view="dashboard">
+                            <span class="nav-icon">📊</span>
+                            Dashboard
+                        </button>
+                        <button class="nav-item" data-view="assets">
+                            <span class="nav-icon">📦</span>
+                            Assets
+                        </button>
+                        <button class="nav-item" data-view="shipments">
+                            <span class="nav-icon">🚚</span>
+                            Shipments
+                        </button>
+                        <button class="nav-item" data-view="locations">
+                            <span class="nav-icon">📍</span>
+                            Locations
+                        </button>
+                    </nav>
+                </div>
+                <div class="header__right">
+                    <div class="location-selector">
+                        <select id="locationSelector" class="form-control location-select">
+                            <option value="all">All Locations</option>
+                        </select>
+                    </div>
+                    <button class="btn btn--secondary btn--sm" id="themeToggle">🌙</button>
+                    <div class="user-menu">
+                        <span class="user-menu__name">Admin User</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main">
+        <div class="container">
+            <!-- Dashboard View -->
+            <div id="dashboardView" class="view view--active">
+                <div class="dashboard">
+                    <div class="dashboard__header">
+                        <h2>Dashboard Overview</h2>
+                        <div class="dashboard__actions">
+                            <button class="btn btn--primary btn--sm" id="refreshData">
+                                <span class="btn-icon">🔄</span>
+                                Refresh
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- KPI Cards -->
+                    <div class="kpi-grid">
+                        <div class="kpi-card">
+                            <div class="kpi-card__icon">📦</div>
+                            <div class="kpi-card__content">
+                                <div class="kpi-card__value" id="totalAssets">0</div>
+                                <div class="kpi-card__label">Total Assets</div>
+                            </div>
+                        </div>
+                        <div class="kpi-card">
+                            <div class="kpi-card__icon">💰</div>
+                            <div class="kpi-card__content">
+                                <div class="kpi-card__value" id="totalValue">$0</div>
+                                <div class="kpi-card__label">Total Value</div>
+                            </div>
+                        </div>
+                        <div class="kpi-card">
+                            <div class="kpi-card__icon">📍</div>
+                            <div class="kpi-card__content">
+                                <div class="kpi-card__value" id="totalLocations">0</div>
+                                <div class="kpi-card__label">Locations</div>
+                            </div>
+                        </div>
+                        <div class="kpi-card">
+                            <div class="kpi-card__icon">🚚</div>
+                            <div class="kpi-card__content">
+                                <div class="kpi-card__value" id="activeShipments">0</div>
+                                <div class="kpi-card__label">Active Shipments</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Charts Section -->
+                    <div class="dashboard__charts">
+                        <div class="chart-container">
+                            <div class="card">
+                                <div class="card__body">
+                                    <h3>Asset Distribution by Category</h3>
+                                    <canvas id="categoryChart" width="400" height="200"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="chart-container">
+                            <div class="card">
+                                <div class="card__body">
+                                    <h3>Assets by Location</h3>
+                                    <canvas id="locationChart" width="400" height="200"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Recent Activity -->
+                    <div class="card">
+                        <div class="card__body">
+                            <h3>Recent Activity</h3>
+                            <div id="recentActivity" class="activity-feed">
+                                <!-- Activity items will be populated by JavaScript -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Assets View -->
+            <div id="assetsView" class="view">
+                <div class="assets">
+                    <div class="assets__header">
+                        <h2>Asset Management</h2>
+                        <div class="assets__actions">
+                            <button class="btn btn--secondary btn--sm" id="exportAssets">
+                                <span class="btn-icon">📤</span>
+                                Export
+                            </button>
+                            <button class="btn btn--primary btn--sm" id="addAsset">
+                                <span class="btn-icon">➕</span>
+                                Add Asset
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Search and Filters -->
+                    <div class="assets__controls">
+                        <div class="search-box">
+                            <input type="text" id="assetSearch" class="form-control" placeholder="Search by name, product code, or supplier...">
+                        </div>
+                        <div class="filter-controls">
+                            <select id="categoryFilter" class="form-control">
+                                <option value="">All Categories</option>
+                            </select>
+                            <select id="statusFilter" class="form-control">
+                                <option value="">All Status</option>
+                            </select>
+                            <select id="locationFilter" class="form-control">
+                                <option value="">All Locations</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- File Upload Area -->
+                    <div class="file-upload" id="fileUpload">
+                        <div class="file-upload__content">
+                            <div class="file-upload__icon">📁</div>
+                            <div class="file-upload__text">
+                                <strong>Drop CSV files here</strong> or click to browse
+                            </div>
+                            <input type="file" id="csvFileInput" accept=".csv" class="file-upload__input">
+                        </div>
+                    </div>
+
+                    <!-- Assets Table -->
+                    <div class="table-container">
+                        <table class="data-table" id="assetsTable">
+                            <thead>
+                                <tr>
+                                    <th><input type="checkbox" id="selectAll"></th>
+                                    <th data-sort="itemName">Item Name</th>
+                                    <th data-sort="productCode">Product Code</th>
+                                    <th data-sort="currentQuantity">Quantity</th>
+                                    <th data-sort="unitPrice">Unit Price</th>
+                                    <th data-sort="totalValue">Total Value</th>
+                                    <th data-sort="location">Location</th>
+                                    <th data-sort="status">Status</th>
+                                    <th data-sort="supplier">Supplier</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="assetsTableBody">
+                                <!-- Table rows will be populated by JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Bulk Actions -->
+                    <div class="bulk-actions" id="bulkActions" style="display: none;">
+                        <div class="bulk-actions__content">
+                            <span class="bulk-actions__count" id="selectedCount">0 selected</span>
+                            <div class="bulk-actions__buttons">
+                                <button class="btn btn--secondary btn--sm" id="bulkMove">Move</button>
+                                <button class="btn btn--secondary btn--sm" id="bulkEdit">Edit</button>
+                                <button class="btn btn--outline btn--sm" id="bulkDelete">Delete</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Shipments View -->
+            <div id="shipmentsView" class="view">
+                <div class="shipments">
+                    <div class="shipments__header">
+                        <h2>Shipment Tracking</h2>
+                        <button class="btn btn--primary btn--sm" id="createShipment">
+                            <span class="btn-icon">➕</span>
+                            Create Shipment
+                        </button>
+                    </div>
+
+                    <div class="shipments-grid" id="shipmentsGrid">
+                        <!-- Shipment cards will be populated by JavaScript -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Locations View -->
+            <div id="locationsView" class="view">
+                <div class="locations">
+                    <div class="locations__header">
+                        <h2>Location Management</h2>
+                    </div>
+
+                    <div class="locations-grid" id="locationsGrid">
+                        <!-- Location cards will be populated by JavaScript -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Modal for Add/Edit Asset -->
+    <div id="assetModal" class="modal">
+        <div class="modal__backdrop"></div>
+        <div class="modal__content">
+            <div class="modal__header">
+                <h3 id="modalTitle">Add Asset</h3>
+                <button class="modal__close" id="closeModal">✕</button>
+            </div>
+            <div class="modal__body">
+                <form id="assetForm">
+                    <div class="form-group">
+                        <label class="form-label" for="itemName">Item Name *</label>
+                        <input type="text" id="itemName" class="form-control" required placeholder="e.g., HP Local Printer">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="productCode">Product Code</label>
+                        <input type="text" id="productCode" class="form-control" placeholder="e.g., 3PZ35A">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="quantity">Quantity *</label>
+                        <input type="number" id="quantity" class="form-control" min="0" required placeholder="e.g., 5">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="unitPrice">Unit Price ($) *</label>
+                        <input type="number" id="unitPrice" class="form-control" min="0" step="0.01" required placeholder="e.g., 350.00">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="assetLocation">Location *</label>
+                        <select id="assetLocation" class="form-control" required>
+                            <!-- Options populated by JavaScript -->
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="assetCategory">Category *</label>
+                        <select id="assetCategory" class="form-control" required>
+                            <!-- Options populated by JavaScript -->
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="assetStatus">Status *</label>
+                        <select id="assetStatus" class="form-control" required>
+                            <!-- Options populated by JavaScript -->
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="supplier">Supplier</label>
+                        <input type="text" id="supplier" class="form-control" placeholder="e.g., HP, Dell, Logitech">
+                    </div>
+                </form>
+            </div>
+            <div class="modal__footer">
+                <button type="button" class="btn btn--secondary" id="cancelModal">Cancel</button>
+                <button type="submit" form="assetForm" class="btn btn--primary" id="saveAsset">Save Asset</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notifications -->
+    <div id="toastContainer" class="toast-container">
+        <!-- Toast notifications will be inserted here -->
+    </div>
+
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay" class="loading-overlay">
+        <div class="loading-spinner"></div>
+        <div class="loading-text">Loading...</div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
