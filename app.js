@@ -207,7 +207,7 @@ const loadData = async () => {
     
     // In a real app, this would be an API call
     // For demo purposes, we're using the provided data
-    const response = await fetch('https://ppl-ai-code-interpreter-files.s3.amazonaws.com/web/direct-files/545211779167356f0b66390ad2ed3c28/cf847e47-0048-4a13-9d58-1ae19833f1fc/2fe0df27.json');
+    const response = await fetch('./2fe0df27.json');
     const data = await response.json();
     
     // Update state with fetched data
