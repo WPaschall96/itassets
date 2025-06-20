@@ -3,315 +3,621 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Asset Tracker Pro</title>
+    <title>IT Asset Tracker</title>
     <link rel="stylesheet" href="style.css">
-    <link rel="manifest" href="data:application/json;base64,eyJuYW1lIjoiQXNzZXQgVHJhY2tlciBQcm8iLCJzaG9ydF9uYW1lIjoiQXNzZXRUcmFja2VyIiwiZGVzY3JpcHRpb24iOiJNb2Rlcm4gYXNzZXQgdHJhY2tpbmcgYXBwbGljYXRpb24iLCJzdGFydF91cmwiOiIvIiwiZGlzcGxheSI6InN0YW5kYWxvbmUiLCJ0aGVtZV9jb2xvciI6IiMyMTgwOGQiLCJiYWNrZ3JvdW5kX2NvbG9yIjoiI2ZjZmNmOSJ9">
 </head>
 <body>
-    <!-- Header -->
-    <header class="header">
-        <div class="container">
-            <div class="header__content">
-                <div class="header__left">
-                    <h1 class="header__logo">Asset Tracker Pro</h1>
-                    <nav class="header__nav" id="mainNav">
-                        <button class="nav-item nav-item--active" data-view="dashboard">
-                            <span class="nav-icon">📊</span>
-                            Dashboard
+    <div id="app">
+        <!-- Header -->
+        <header class="header">
+            <div class="container">
+                <div class="flex items-center justify-between">
+                    <h1 class="header__title">IT Asset Tracker</h1>
+                    <div class="flex items-center gap-16">
+                        <!-- Location Selector -->
+                        <div class="location-selector">
+                            <select id="locationSelector" class="form-control">
+                                <option value="global">Global (Admin View)</option>
+                                <!-- Location options will be populated dynamically -->
+                            </select>
+                        </div>
+                        <button id="themeToggle" class="btn btn--outline btn--sm">
+                            <span id="themeIcon">🌙</span>
                         </button>
-                        <button class="nav-item" data-view="assets">
-                            <span class="nav-icon">📦</span>
-                            Assets
-                        </button>
-                        <button class="nav-item" data-view="shipments">
-                            <span class="nav-icon">🚚</span>
-                            Shipments
-                        </button>
-                        <button class="nav-item" data-view="locations">
-                            <span class="nav-icon">📍</span>
-                            Locations
-                        </button>
-                    </nav>
-                </div>
-                <div class="header__right">
-                    <div class="location-selector">
-                        <select id="locationSelector" class="form-control location-select">
-                            <option value="all">All Locations</option>
-                        </select>
-                    </div>
-                    <button class="btn btn--secondary btn--sm" id="themeToggle">🌙</button>
-                    <div class="user-menu">
-                        <span class="user-menu__name">Admin User</span>
                     </div>
                 </div>
             </div>
-        </div>
-    </header>
+        </header>
 
-    <!-- Main Content -->
-    <main class="main">
-        <div class="container">
-            <!-- Dashboard View -->
-            <div id="dashboardView" class="view view--active">
-                <div class="dashboard">
-                    <div class="dashboard__header">
-                        <h2>Dashboard Overview</h2>
-                        <div class="dashboard__actions">
-                            <button class="btn btn--primary btn--sm" id="refreshData">
-                                <span class="btn-icon">🔄</span>
-                                Refresh
-                            </button>
-                        </div>
-                    </div>
+        <!-- Navigation -->
+        <nav class="nav">
+            <div class="container">
+                <div class="nav__tabs">
+                    <button class="nav__tab nav__tab--active" data-tab="dashboard">Dashboard</button>
+                    <button class="nav__tab" data-tab="inventory">Inventory</button>
+                    <button class="nav__tab" data-tab="shipping">Shipping</button>
+                    <button class="nav__tab" data-tab="audit">Audit</button>
+                    <button class="nav__tab" data-tab="reports">Reports</button>
+                    <button class="nav__tab" data-tab="centralCsv">Central CSV</button>
+                    <button class="nav__tab" data-tab="admin">Admin</button>
+                </div>
+            </div>
+        </nav>
 
-                    <!-- KPI Cards -->
-                    <div class="kpi-grid">
-                        <div class="kpi-card">
-                            <div class="kpi-card__icon">📦</div>
-                            <div class="kpi-card__content">
-                                <div class="kpi-card__value" id="totalAssets">0</div>
-                                <div class="kpi-card__label">Total Assets</div>
+        <!-- Main Content -->
+        <main class="main">
+            <div class="container">
+                <!-- Dashboard Tab -->
+                <div class="tab-content tab-content--active" id="dashboard">
+                    <div class="dashboard">
+                        <div class="dashboard__metrics">
+                            <div class="metric-card">
+                                <h3>Total Assets</h3>
+                                <p class="metric-value" id="totalAssets">0</p>
+                            </div>
+                            <div class="metric-card">
+                                <h3>Active Shipments</h3>
+                                <p class="metric-value" id="activeShipments">0</p>
+                            </div>
+                            <div class="metric-card">
+                                <h3>Pending Audits</h3>
+                                <p class="metric-value" id="pendingAudits">0</p>
+                            </div>
+                            <div class="metric-card">
+                                <h3>Total Value</h3>
+                                <p class="metric-value" id="totalValue">$0</p>
                             </div>
                         </div>
-                        <div class="kpi-card">
-                            <div class="kpi-card__icon">💰</div>
-                            <div class="kpi-card__content">
-                                <div class="kpi-card__value" id="totalValue">$0</div>
-                                <div class="kpi-card__label">Total Value</div>
-                            </div>
-                        </div>
-                        <div class="kpi-card">
-                            <div class="kpi-card__icon">📍</div>
-                            <div class="kpi-card__content">
-                                <div class="kpi-card__value" id="totalLocations">0</div>
-                                <div class="kpi-card__label">Locations</div>
-                            </div>
-                        </div>
-                        <div class="kpi-card">
-                            <div class="kpi-card__icon">🚚</div>
-                            <div class="kpi-card__content">
-                                <div class="kpi-card__value" id="activeShipments">0</div>
-                                <div class="kpi-card__label">Active Shipments</div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Charts Section -->
-                    <div class="dashboard__charts">
-                        <div class="chart-container">
-                            <div class="card">
-                                <div class="card__body">
-                                    <h3>Asset Distribution by Category</h3>
-                                    <canvas id="categoryChart" width="400" height="200"></canvas>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="chart-container">
-                            <div class="card">
-                                <div class="card__body">
-                                    <h3>Assets by Location</h3>
-                                    <canvas id="locationChart" width="400" height="200"></canvas>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Recent Activity -->
-                    <div class="card">
-                        <div class="card__body">
+                        <div class="dashboard__activity">
                             <h3>Recent Activity</h3>
-                            <div id="recentActivity" class="activity-feed">
-                                <!-- Activity items will be populated by JavaScript -->
+                            <div id="recentActivity" class="activity-list">
+                                <p class="text-secondary">No recent activity</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Inventory Tab -->
+                <div class="tab-content" id="inventory">
+                    <div class="section">
+                        <div class="section__header">
+                            <h2>Asset Inventory</h2>
+                            <div class="flex gap-8">
+                                <button id="importCsvBtn" class="btn btn--secondary">Import CSV</button>
+                                <button id="syncWithCentralBtn" class="btn btn--secondary">Sync with Central</button>
+                                <button id="addAssetBtn" class="btn btn--primary">Add Asset</button>
+                            </div>
+                        </div>
+                        <div class="table-container">
+                            <table class="table" id="assetsTable">
+                                <thead>
+                                    <tr>
+                                        <th data-field="itemName">Item Name</th>
+                                        <th data-field="startingQuantity">Starting Quantity</th>
+                                        <th data-field="currentQuantity">Current Quantity</th>
+                                        <th data-field="unitPrice">Unit Price</th>
+                                        <th data-field="totalValue">Total Value</th>
+                                        <th data-field="location">Location</th>
+                                        <th data-field="status">Status</th>
+                                        <th data-field="syncStatus">Sync Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="assetsTableBody">
+                                    <tr>
+                                        <td colspan="9" class="text-center text-secondary">No assets found</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Shipping Tab -->
+                <div class="tab-content" id="shipping">
+                    <div class="section">
+                        <div class="section__header">
+                            <h2>Shipping Tracker</h2>
+                            <button id="addShipmentBtn" class="btn btn--primary">Record Shipment</button>
+                        </div>
+                        <div class="table-container">
+                            <table class="table" id="shipmentsTable">
+                                <thead>
+                                    <tr>
+                                        <th>Tracking Number</th>
+                                        <th>Asset</th>
+                                        <th>From</th>
+                                        <th>To</th>
+                                        <th>Status</th>
+                                        <th>Date</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="shipmentsTableBody">
+                                    <tr>
+                                        <td colspan="7" class="text-center text-secondary">No shipments found</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Audit Tab -->
+                <div class="tab-content" id="audit">
+                    <div class="section">
+                        <div class="section__header">
+                            <h2>Audit Tools</h2>
+                            <button id="startAuditBtn" class="btn btn--primary">Start Audit</button>
+                        </div>
+                        <div id="auditContent">
+                            <p class="text-secondary">Select an asset to begin audit process</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Reports Tab -->
+                <div class="tab-content" id="reports">
+                    <div class="section">
+                        <div class="section__header">
+                            <h2>Reports & Analytics</h2>
+                            <button id="exportDataBtn" class="btn btn--primary">Export Data</button>
+                        </div>
+                        <div class="reports-grid">
+                            <div class="card">
+                                <div class="card__body">
+                                    <h4>Asset Summary</h4>
+                                    <div id="assetSummary"></div>
+                                </div>
+                            </div>
+                            <div class="card">
+                                <div class="card__body">
+                                    <h4>Location Distribution</h4>
+                                    <div id="locationDistribution"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Central CSV Tab (New) -->
+                <div class="tab-content" id="centralCsv">
+                    <div class="section">
+                        <div class="section__header">
+                            <h2>Central CSV Repository</h2>
+                            <div class="flex gap-8">
+                                <button id="uploadCentralCsvBtn" class="btn btn--primary">Upload Master CSV</button>
+                            </div>
+                        </div>
+                        
+                        <div class="card mb-16">
+                            <div class="card__body">
+                                <h4>Master CSV Files</h4>
+                                <div class="table-container">
+                                    <table class="table" id="centralCsvTable">
+                                        <thead>
+                                            <tr>
+                                                <th>Filename</th>
+                                                <th>Version</th>
+                                                <th>Upload Date</th>
+                                                <th>Asset Count</th>
+                                                <th>Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="centralCsvTableBody">
+                                            <tr>
+                                                <td colspan="5" class="text-center text-secondary">No master CSV files found</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="card">
+                            <div class="card__header">
+                                <h3>Sync History</h3>
+                            </div>
+                            <div class="card__body">
+                                <div class="table-container">
+                                    <table class="table" id="syncHistoryTable">
+                                        <thead>
+                                            <tr>
+                                                <th>Date</th>
+                                                <th>Location</th>
+                                                <th>Direction</th>
+                                                <th>Status</th>
+                                                <th>Items Affected</th>
+                                                <th>Conflicts</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="syncHistoryTableBody">
+                                            <tr>
+                                                <td colspan="6" class="text-center text-secondary">No sync history found</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card mt-16">
+                            <div class="card__header">
+                                <h3>Sync Settings</h3>
+                            </div>
+                            <div class="card__body">
+                                <div class="form-group">
+                                    <label class="form-label">Auto Sync Schedule</label>
+                                    <select id="autoSyncSchedule" class="form-control">
+                                        <option value="none">Manual Only</option>
+                                        <option value="daily">Daily</option>
+                                        <option value="weekly">Weekly</option>
+                                        <option value="monthly">Monthly</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Conflict Resolution Strategy</label>
+                                    <select id="conflictStrategy" class="form-control">
+                                        <option value="central">Central CSV Takes Priority</option>
+                                        <option value="local">Local Data Takes Priority</option>
+                                        <option value="newer">Newer Data Takes Priority</option>
+                                        <option value="manual">Manual Resolution</option>
+                                    </select>
+                                </div>
+                                <button id="saveAutoSyncBtn" class="btn btn--primary">Save Settings</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Admin Tab -->
+                <div class="tab-content" id="admin">
+                    <div class="section">
+                        <div class="section__header">
+                            <h2>Admin Panel</h2>
+                        </div>
+                        <div class="admin-panels">
+                            <!-- Location Management (New) -->
+                            <div class="card">
+                                <div class="card__header">
+                                    <h3>Location Management</h3>
+                                </div>
+                                <div class="card__body">
+                                    <div class="flex justify-between mb-16">
+                                        <h4>Locations</h4>
+                                        <button id="addLocationBtn" class="btn btn--primary btn--sm">Add Location</button>
+                                    </div>
+                                    <div class="table-container">
+                                        <table class="table" id="locationsTable">
+                                            <thead>
+                                                <tr>
+                                                    <th>Name</th>
+                                                    <th>Currency</th>
+                                                    <th>Date Format</th>
+                                                    <th>Users</th>
+                                                    <th>Actions</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="locationsTableBody">
+                                                <tr>
+                                                    <td colspan="5" class="text-center text-secondary">No locations configured</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="card">
+                                <div class="card__header">
+                                    <h3>Field Header Customization</h3>
+                                </div>
+                                <div class="card__body">
+                                    <div class="table-container">
+                                        <table class="table" id="headersTable">
+                                            <thead>
+                                                <tr>
+                                                    <th>Field Name</th>
+                                                    <th>Display Name</th>
+                                                    <th>Actions</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="headersTableBody"></tbody>
+                                        </table>
+                                    </div>
+                                    <div class="flex gap-8 mt-16">
+                                        <button id="saveHeadersBtn" class="btn btn--primary">Save Changes</button>
+                                        <button id="resetHeadersBtn" class="btn btn--outline">Reset to Defaults</button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="card">
+                                <div class="card__header">
+                                    <h3>System Settings</h3>
+                                </div>
+                                <div class="card__body">
+                                    <div class="form-group">
+                                        <label class="form-label">Default Currency Symbol</label>
+                                        <input type="text" id="currencySymbol" class="form-control" value="$" maxlength="3">
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">Default Date Format</label>
+                                        <select id="dateFormat" class="form-control">
+                                            <option value="MM/DD/YYYY">MM/DD/YYYY</option>
+                                            <option value="DD/MM/YYYY">DD/MM/YYYY</option>
+                                            <option value="YYYY-MM-DD">YYYY-MM-DD</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">Export Filename Pattern</label>
+                                        <input type="text" id="exportPattern" class="form-control" value="assets_export_{date}">
+                                        <small class="text-secondary">Use {date} for current date, {location} for location</small>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="card">
+                                <div class="card__header">
+                                    <h3>Data Management</h3>
+                                </div>
+                                <div class="card__body">
+                                    <div class="flex gap-8">
+                                        <button id="exportAllBtn" class="btn btn--secondary">Export All Data</button>
+                                        <button id="clearDataBtn" class="btn btn--outline">Clear All Data</button>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
+        </main>
+    </div>
 
-            <!-- Assets View -->
-            <div id="assetsView" class="view">
-                <div class="assets">
-                    <div class="assets__header">
-                        <h2>Asset Management</h2>
-                        <div class="assets__actions">
-                            <button class="btn btn--secondary btn--sm" id="exportAssets">
-                                <span class="btn-icon">📤</span>
-                                Export
-                            </button>
-                            <button class="btn btn--primary btn--sm" id="addAsset">
-                                <span class="btn-icon">➕</span>
-                                Add Asset
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- Search and Filters -->
-                    <div class="assets__controls">
-                        <div class="search-box">
-                            <input type="text" id="assetSearch" class="form-control" placeholder="Search by name, product code, or supplier...">
-                        </div>
-                        <div class="filter-controls">
-                            <select id="categoryFilter" class="form-control">
-                                <option value="">All Categories</option>
-                            </select>
-                            <select id="statusFilter" class="form-control">
-                                <option value="">All Status</option>
-                            </select>
-                            <select id="locationFilter" class="form-control">
-                                <option value="">All Locations</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <!-- File Upload Area -->
-                    <div class="file-upload" id="fileUpload">
-                        <div class="file-upload__content">
-                            <div class="file-upload__icon">📁</div>
-                            <div class="file-upload__text">
-                                <strong>Drop CSV files here</strong> or click to browse
-                            </div>
-                            <input type="file" id="csvFileInput" accept=".csv" class="file-upload__input">
-                        </div>
-                    </div>
-
-                    <!-- Assets Table -->
-                    <div class="table-container">
-                        <table class="data-table" id="assetsTable">
-                            <thead>
-                                <tr>
-                                    <th><input type="checkbox" id="selectAll"></th>
-                                    <th data-sort="itemName">Item Name</th>
-                                    <th data-sort="productCode">Product Code</th>
-                                    <th data-sort="currentQuantity">Quantity</th>
-                                    <th data-sort="unitPrice">Unit Price</th>
-                                    <th data-sort="totalValue">Total Value</th>
-                                    <th data-sort="location">Location</th>
-                                    <th data-sort="status">Status</th>
-                                    <th data-sort="supplier">Supplier</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody id="assetsTableBody">
-                                <!-- Table rows will be populated by JavaScript -->
-                            </tbody>
-                        </table>
-                    </div>
-
-                    <!-- Bulk Actions -->
-                    <div class="bulk-actions" id="bulkActions" style="display: none;">
-                        <div class="bulk-actions__content">
-                            <span class="bulk-actions__count" id="selectedCount">0 selected</span>
-                            <div class="bulk-actions__buttons">
-                                <button class="btn btn--secondary btn--sm" id="bulkMove">Move</button>
-                                <button class="btn btn--secondary btn--sm" id="bulkEdit">Edit</button>
-                                <button class="btn btn--outline btn--sm" id="bulkDelete">Delete</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Shipments View -->
-            <div id="shipmentsView" class="view">
-                <div class="shipments">
-                    <div class="shipments__header">
-                        <h2>Shipment Tracking</h2>
-                        <button class="btn btn--primary btn--sm" id="createShipment">
-                            <span class="btn-icon">➕</span>
-                            Create Shipment
-                        </button>
-                    </div>
-
-                    <div class="shipments-grid" id="shipmentsGrid">
-                        <!-- Shipment cards will be populated by JavaScript -->
-                    </div>
-                </div>
-            </div>
-
-            <!-- Locations View -->
-            <div id="locationsView" class="view">
-                <div class="locations">
-                    <div class="locations__header">
-                        <h2>Location Management</h2>
-                    </div>
-
-                    <div class="locations-grid" id="locationsGrid">
-                        <!-- Location cards will be populated by JavaScript -->
-                    </div>
-                </div>
-            </div>
-        </div>
-    </main>
-
-    <!-- Modal for Add/Edit Asset -->
+    <!-- Asset Modal -->
     <div id="assetModal" class="modal">
-        <div class="modal__backdrop"></div>
         <div class="modal__content">
             <div class="modal__header">
-                <h3 id="modalTitle">Add Asset</h3>
-                <button class="modal__close" id="closeModal">✕</button>
+                <h3 id="assetModalTitle">Add Asset</h3>
+                <button class="modal__close" id="closeAssetModal">&times;</button>
             </div>
             <div class="modal__body">
                 <form id="assetForm">
                     <div class="form-group">
-                        <label class="form-label" for="itemName">Item Name *</label>
-                        <input type="text" id="itemName" class="form-control" required placeholder="e.g., HP Local Printer">
+                        <label class="form-label">Item Name</label>
+                        <input type="text" id="itemName" class="form-control" required>
                     </div>
                     <div class="form-group">
-                        <label class="form-label" for="productCode">Product Code</label>
-                        <input type="text" id="productCode" class="form-control" placeholder="e.g., 3PZ35A">
+                        <label class="form-label">Starting Quantity</label>
+                        <input type="number" id="startingQuantity" class="form-control" min="0" required>
                     </div>
                     <div class="form-group">
-                        <label class="form-label" for="quantity">Quantity *</label>
-                        <input type="number" id="quantity" class="form-control" min="0" required placeholder="e.g., 5">
+                        <label class="form-label">Current Quantity</label>
+                        <input type="number" id="currentQuantity" class="form-control" min="0" required>
                     </div>
                     <div class="form-group">
-                        <label class="form-label" for="unitPrice">Unit Price ($) *</label>
-                        <input type="number" id="unitPrice" class="form-control" min="0" step="0.01" required placeholder="e.g., 350.00">
+                        <label class="form-label">Unit Price</label>
+                        <input type="number" id="unitPrice" class="form-control" min="0" step="0.01" required>
                     </div>
                     <div class="form-group">
-                        <label class="form-label" for="assetLocation">Location *</label>
-                        <select id="assetLocation" class="form-control" required>
-                            <!-- Options populated by JavaScript -->
+                        <label class="form-label">Location</label>
+                        <input type="text" id="location" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Status</label>
+                        <select id="status" class="form-control" required>
+                            <option value="">Select Status</option>
+                            <option value="active">Active</option>
+                            <option value="inactive">Inactive</option>
+                            <option value="maintenance">Maintenance</option>
+                            <option value="retired">Retired</option>
                         </select>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label" for="assetCategory">Category *</label>
-                        <select id="assetCategory" class="form-control" required>
-                            <!-- Options populated by JavaScript -->
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label" for="assetStatus">Status *</label>
-                        <select id="assetStatus" class="form-control" required>
-                            <!-- Options populated by JavaScript -->
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label" for="supplier">Supplier</label>
-                        <input type="text" id="supplier" class="form-control" placeholder="e.g., HP, Dell, Logitech">
                     </div>
                 </form>
             </div>
             <div class="modal__footer">
-                <button type="button" class="btn btn--secondary" id="cancelModal">Cancel</button>
+                <button type="button" class="btn btn--outline" id="cancelAsset">Cancel</button>
                 <button type="submit" form="assetForm" class="btn btn--primary" id="saveAsset">Save Asset</button>
             </div>
         </div>
     </div>
 
+    <!-- CSV Import Modal -->
+    <div id="csvModal" class="modal">
+        <div class="modal__content modal__content--large">
+            <div class="modal__header">
+                <h3>Import CSV</h3>
+                <button class="modal__close" id="closeCsvModal">&times;</button>
+            </div>
+            <div class="modal__body">
+                <div id="csvStep1" class="csv-step">
+                    <div class="form-group">
+                        <label class="form-label">Select CSV File</label>
+                        <input type="file" id="csvFile" class="form-control" accept=".csv" required>
+                    </div>
+                    <div id="csvPreview" class="hidden">
+                        <h4>Preview (First 5 rows)</h4>
+                        <div class="table-container">
+                            <table class="table" id="csvPreviewTable"></table>
+                        </div>
+                    </div>
+                </div>
+                <div id="csvStep2" class="csv-step hidden">
+                    <h4>Column Mapping</h4>
+                    <p class="text-secondary">Map CSV columns to asset fields:</p>
+                    <div id="columnMapping"></div>
+                    <div id="importProgress" class="hidden">
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="progressFill"></div>
+                        </div>
+                        <p id="progressText">Processing...</p>
+                    </div>
+                    <div id="importResults" class="hidden">
+                        <h4>Import Results</h4>
+                        <div id="importSummary"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal__footer">
+                <button type="button" class="btn btn--outline" id="cancelCsv">Cancel</button>
+                <button type="button" class="btn btn--primary" id="nextCsvStep">Next</button>
+                <button type="button" class="btn btn--primary hidden" id="startImport">Import</button>
+                <button type="button" class="btn btn--primary hidden" id="finishImport">Finish</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Shipment Modal -->
+    <div id="shipmentModal" class="modal">
+        <div class="modal__content">
+            <div class="modal__header">
+                <h3>Record Shipment</h3>
+                <button class="modal__close" id="closeShipmentModal">&times;</button>
+            </div>
+            <div class="modal__body">
+                <form id="shipmentForm">
+                    <div class="form-group">
+                        <label class="form-label">Tracking Number</label>
+                        <input type="text" id="trackingNumber" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Asset</label>
+                        <select id="shipmentAsset" class="form-control" required>
+                            <option value="">Select Asset</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">From Location</label>
+                        <input type="text" id="fromLocation" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">To Location</label>
+                        <input type="text" id="toLocation" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Status</label>
+                        <select id="shipmentStatus" class="form-control" required>
+                            <option value="">Select Status</option>
+                            <option value="pending">Pending</option>
+                            <option value="in-transit">In Transit</option>
+                            <option value="delivered">Delivered</option>
+                            <option value="delayed">Delayed</option>
+                        </select>
+                    </div>
+                </form>
+            </div>
+            <div class="modal__footer">
+                <button type="button" class="btn btn--outline" id="cancelShipment">Cancel</button>
+                <button type="submit" form="shipmentForm" class="btn btn--primary" id="saveShipment">Save Shipment</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Location Modal (New) -->
+    <div id="locationModal" class="modal">
+        <div class="modal__content">
+            <div class="modal__header">
+                <h3 id="locationModalTitle">Add Location</h3>
+                <button class="modal__close" id="closeLocationModal">&times;</button>
+            </div>
+            <div class="modal__body">
+                <form id="locationForm">
+                    <div class="form-group">
+                        <label class="form-label">Location Name</label>
+                        <input type="text" id="locationName" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Currency Symbol</label>
+                        <input type="text" id="locationCurrency" class="form-control" maxlength="3" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Date Format</label>
+                        <select id="locationDateFormat" class="form-control" required>
+                            <option value="MM/DD/YYYY">MM/DD/YYYY</option>
+                            <option value="DD/MM/YYYY">DD/MM/YYYY</option>
+                            <option value="YYYY-MM-DD">YYYY-MM-DD</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Timezone</label>
+                        <select id="locationTimezone" class="form-control" required>
+                            <option value="UTC">UTC</option>
+                            <option value="EST">Eastern Time (EST)</option>
+                            <option value="CST">Central Time (CST)</option>
+                            <option value="MST">Mountain Time (MST)</option>
+                            <option value="PST">Pacific Time (PST)</option>
+                            <option value="GMT">Greenwich Mean Time (GMT)</option>
+                            <option value="CET">Central European Time (CET)</option>
+                            <option value="JST">Japan Standard Time (JST)</option>
+                        </select>
+                    </div>
+                </form>
+            </div>
+            <div class="modal__footer">
+                <button type="button" class="btn btn--outline" id="cancelLocation">Cancel</button>
+                <button type="submit" form="locationForm" class="btn btn--primary" id="saveLocation">Save Location</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Central CSV Upload Modal (New) -->
+    <div id="centralCsvUploadModal" class="modal">
+        <div class="modal__content">
+            <div class="modal__header">
+                <h3>Upload Master CSV</h3>
+                <button class="modal__close" id="closeCentralCsvUploadModal">&times;</button>
+            </div>
+            <div class="modal__body">
+                <div class="form-group">
+                    <label class="form-label">Select CSV File</label>
+                    <input type="file" id="centralCsvFile" class="form-control" accept=".csv" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Version Label</label>
+                    <input type="text" id="csvVersionLabel" class="form-control" placeholder="e.g., Q2-2025">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Description</label>
+                    <textarea id="csvDescription" class="form-control" rows="3"></textarea>
+                </div>
+                <div id="centralCsvPreview" class="hidden">
+                    <h4>Preview</h4>
+                    <div class="table-container">
+                        <table class="table" id="centralCsvPreviewTable"></table>
+                    </div>
+                </div>
+            </div>
+            <div class="modal__footer">
+                <button type="button" class="btn btn--outline" id="cancelCentralCsvUpload">Cancel</button>
+                <button type="button" class="btn btn--primary" id="uploadCentralCsv">Upload</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sync Conflict Resolution Modal (New) -->
+    <div id="conflictModal" class="modal">
+        <div class="modal__content modal__content--large">
+            <div class="modal__header">
+                <h3>Resolve Sync Conflicts</h3>
+                <button class="modal__close" id="closeConflictModal">&times;</button>
+            </div>
+            <div class="modal__body">
+                <p>The following assets have conflicts between central and local data. Please select which version to keep:</p>
+                <div id="conflictsContainer">
+                    <!-- Conflicts will be dynamically inserted here -->
+                </div>
+            </div>
+            <div class="modal__footer">
+                <button type="button" class="btn btn--outline" id="cancelConflictResolution">Cancel</button>
+                <button type="button" class="btn btn--primary" id="resolveConflicts">Apply Resolutions</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Toast Notifications -->
-    <div id="toastContainer" class="toast-container">
-        <!-- Toast notifications will be inserted here -->
-    </div>
+    <div id="toastContainer" class="toast-container"></div>
 
-    <!-- Loading Overlay -->
-    <div id="loadingOverlay" class="loading-overlay">
-        <div class="loading-spinner"></div>
-        <div class="loading-text">Loading...</div>
-    </div>
-
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="app.js"></script>
 </body>
 </html>

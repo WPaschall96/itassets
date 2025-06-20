@@ -1,0 +1,27 @@
+# Asset Tracker Pro - Cloudflare Pages Configuration
+# This file configures the deployment settings for Cloudflare Pages
+
+name = "asset-tracker-pro"
+compatibility_date = "2025-01-01"
+
+# Static site configuration
+[build]
+command = ""
+cwd = ""
+watch_dir = ""
+
+# Environment variables for production
+[vars]
+NODE_ENV = "production"
+APP_NAME = "Asset Tracker Pro"
+APP_VERSION = "1.0.0"
+
+# Build configuration for Pages
+pages_build_output_dir = "./"
+
+# Security headers and optimizations
+[env.production]
+vars = { NODE_ENV = "production" }
+
+[env.preview]
+vars = { NODE_ENV = "staging" }

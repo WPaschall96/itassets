@@ -1,0 +1,17 @@
+# Cloudflare Pages Redirects Configuration
+# This file handles routing for the Asset Tracker Pro single-page application
+
+# Ensure all routes serve the main application
+/assets/* /index.html 200
+/dashboard/* /index.html 200
+/admin/* /index.html 200
+/reports/* /index.html 200
+
+# Handle legacy URLs or common typos
+/asset-tracker /index.html 301
+/tracker /index.html 301
+
+# Security redirects
+/admin /index.html 200
+/.env 404
+/config/* 404
